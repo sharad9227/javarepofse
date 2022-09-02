@@ -108,15 +108,18 @@ public class UserService {
             query.addCriteria(Criteria.where("password").is(password));
             userEntity = repository.findByCriteria(query);
             if (userEntity != null) {
-                if (StringUtils.isEmpty(userEntity.getLoginId())) {
+                if (!StringUtils.isEmpty(userEntity.getLoginId())) {
                     //setting login information in login gesture table
                     responseObject.setStatus(HttpStatus.OK);
                     responseObject.setMessage("Active and Approved User");
+                    HashMap<String, String> map = new HashMap<>();
+                    map.put("loginId",userEntity.getLoginId());
+                    responseObject.setLoginId(map);
                 }
                 return ResponseEntity.ok().body(responseObject);
             } else {
                 responseObject.setStatus(HttpStatus.UNAUTHORIZED);
-                responseObject.setMessage("Username or password is incorrect.Please try again!");
+                responseObject.setMessage("Use  rname or password is incorrect.Please try again!");
                 responseObject.setResponseObj(null);
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
@@ -214,7 +217,7 @@ public class UserService {
 
     //            tweets.addAll(dup);
 
-
+            System.out.println(tweets);
             return tweets;
         }
 

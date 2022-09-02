@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value="/api")
+@RequestMapping(value="/api/v1.0/tweets")
 public class TweetController {
 
     private static final Logger logger = LoggerFactory.getLogger(TweetController.class);

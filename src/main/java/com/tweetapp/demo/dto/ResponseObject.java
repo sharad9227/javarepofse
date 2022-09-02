@@ -10,6 +10,19 @@ public class ResponseObject {
     private String message;
     public HttpStatus status;
     private HashMap<String, Object> responseObj;
+    private HashMap<String,String> loginId;
+
+
+    public HashMap<String, String> getLoginId() {
+        return loginId;
+    }
+
+    public void setLoginId(HashMap<String, String> loginId) {
+        this.loginId = loginId;
+    }
+
+
+
 
     private String errorMessage;
 
