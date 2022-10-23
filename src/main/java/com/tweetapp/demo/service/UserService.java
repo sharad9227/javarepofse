@@ -1,6 +1,6 @@
 package com.tweetapp.demo.service;
 
-import org.apache.commons.collections4.IteratorUtils;
+import com.mongodb.client.result.DeleteResult;
 import com.tweetapp.demo.dto.ResponseObject;
 import com.tweetapp.demo.entity.TweetEntity;
 import com.tweetapp.demo.entity.UserEntity;
@@ -11,18 +11,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.http.HttpHeaders;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -39,11 +40,10 @@ public class UserService {
     TweetRepository tweetRepository;
 
 
-
-
     /* Service method for registering new user */
     public ResponseEntity<ResponseObject> registerUser(UserEntity user) throws Exception {
-        try {
+        try
+        {
             ResponseObject responseObject = new ResponseObject();
             UserEntity userEntity = new UserEntity();
             ArrayList<String> array = new ArrayList<String>();
@@ -54,10 +54,12 @@ public class UserService {
 
 
             ListIterator<UserEntity> crunchifyListIterator = this.repository.findAll().listIterator();
-            while (crunchifyListIterator.hasNext()) {
+            while (crunchifyListIterator.hasNext())
+            {
                 array.add(crunchifyListIterator.next().getLoginId());
             }
-            if (!array.contains(user.getLoginId())) {
+            if (!array.contains(user.getLoginId()))
+            {
                 //success flag
 
                 userEntity = this.repository.saveUser(user);
@@ -65,7 +67,8 @@ public class UserService {
                 responseObject.setMessage("User Registered Successfully. Please use your email id :" + userEntity.getEmail() + " to log into the application");
                 log.info(responseObject.getMessage());
                 return ResponseEntity.ok().body(responseObject);
-            } else {
+            } else
+            {
                 //error flag :405 Method Not Allowed :Some processing error
                 responseObject.setStatus(HttpStatus.FORBIDDEN);
                 responseObject.setMessage("Error occurred in Registration.Please try later");
@@ -73,11 +76,13 @@ public class UserService {
             }
 
 
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
 
             //  responseObject.setResponseObj(null);
             Throwable cause = e;
-            if (cause.getMessage().contains("duplicate key")) {
+            if (cause.getMessage().contains("duplicate key"))
+            {
                 responseObject.setErrorMessage("Duplicate entry.Email already exists");
                 responseObject.setStatus(HttpStatus.CONFLICT);
                 responseObject.setMessage("Exception occurred" + e.getMessage());
@@ -100,32 +105,37 @@ public class UserService {
 
     public ResponseEntity<ResponseObject> loginUser(String email, String password) throws Exception {
         //   HashMap<String, Object> userDetails = new HashMap<String, Object>();
-        try {
+        try
+        {
 
             Query query = new Query();
             UserEntity userEntity = new UserEntity();
             query.addCriteria(Criteria.where("email").is(email));
             query.addCriteria(Criteria.where("password").is(password));
             userEntity = repository.findByCriteria(query);
-            if (userEntity != null) {
-                if (!StringUtils.isEmpty(userEntity.getLoginId())) {
+            if (userEntity != null)
+            {
+                if (!StringUtils.isEmpty(userEntity.getLoginId()))
+                {
                     //setting login information in login gesture table
                     responseObject.setStatus(HttpStatus.OK);
                     responseObject.setMessage("Active and Approved User");
                     HashMap<String, String> map = new HashMap<>();
-                    map.put("loginId",userEntity.getLoginId());
+                    map.put("loginId", userEntity.getLoginId());
                     responseObject.setLoginId(map);
                 }
                 return ResponseEntity.ok().body(responseObject);
-            } else {
+            } else
+            {
                 responseObject.setStatus(HttpStatus.UNAUTHORIZED);
-                responseObject.setMessage("Use  rname or password is incorrect.Please try again!");
+                responseObject.setMessage("User name or password is incorrect.Please try again!");
                 responseObject.setResponseObj(null);
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
 
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             //  responseObject.setErrorMessage("Duplicate entry.Email already exists");
             responseObject.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             responseObject.setMessage("Exception occurred" + e.getMessage());
@@ -141,14 +151,17 @@ public class UserService {
     /* Service method for inserting tweets into the database */
 
     public ResponseEntity<ResponseObject> postTweet(TweetEntity tweetEntity) {
-        try {
-            if (!tweetEntity.getMessage().isEmpty()) {
+        try
+        {
+            if (!tweetEntity.getMessage().isEmpty())
+            {
                 TweetEntity tweet = new TweetEntity();
-              //  tweetEntity.setLoginId(tweetEntity.getLoginId());
-              //  tweetEntity.setMessage(tweetEntity.getMessage());
+                //  tweetEntity.setLoginId(tweetEntity.getLoginId());
+                //  tweetEntity.setMessage(tweetEntity.getMessage());
                 tweetEntity.setTweetTime(LocalDateTime.now());
                 tweet = this.tweetRepository.saveTweet(tweetEntity);
-                if (tweet != null) {
+                if (tweet != null)
+                {
                     responseObject.setStatus(HttpStatus.OK);
                     responseObject.setMessage("Tweet Saved Successfully");
                 }
@@ -156,7 +169,8 @@ public class UserService {
 
             return ResponseEntity.ok().body(responseObject);
 
-        } catch (Exception ex) {
+        } catch (Exception ex)
+        {
             responseObject.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             responseObject.setMessage("Error in Saving Tweet" + ex.getMessage());
             return ResponseEntity.internalServerError().body(responseObject);
@@ -169,16 +183,21 @@ public class UserService {
     public ResponseEntity<ResponseObject> updateTweet(TweetEntity tweetEntity) {
         TweetEntity tweet = new TweetEntity();
         Query query = new Query();
-        try {
+        try
+        {
 
-            if (!tweetEntity.getId().isEmpty()) {
+            if (!tweetEntity.getId().isEmpty())
+            {
                 //   Query query=new Query();
                 query.addCriteria(Criteria.where("_id").is(tweetEntity.getId()));
                 tweetEntity.setTweetTime(LocalDateTime.now());
 
                 tweet = this.tweetRepository.findByCriteria(query);
-                if (tweet != null) {
-                    this.tweetRepository.saveTweet(tweetEntity);
+                if (tweet != null)
+                {
+                    Update update = new Update();
+                    update.set("message", tweetEntity.getMessage());
+                    this.tweetRepository.updateByCriteria(query, update);
                     responseObject.setStatus(HttpStatus.OK);
                     responseObject.setMessage("Tweet Updated Successfully");
                 }
@@ -186,7 +205,8 @@ public class UserService {
 
             return ResponseEntity.ok().body(responseObject);
 
-        } catch (Exception ex) {
+        } catch (Exception ex)
+        {
             responseObject.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             responseObject.setMessage("Error in Updating Tweet" + ex.getMessage());
             return ResponseEntity.internalServerError().body(responseObject);
@@ -195,43 +215,84 @@ public class UserService {
     }
 
 
-        public List<TweetEntity> getTweets() {
-            List<TweetEntity> tweets= this.tweetRepository.fetchAll();
-//            List<TweetEntity> dup =new ArrayList<>();
+    public List<TweetEntity> getTweets() {
+        return this.tweetRepository.fetchAll();
 
-            Iterator<TweetEntity> listIterator = tweets.iterator();
+    }
+    /* Service method for increasing like count of tweets into the database */
 
-            for(TweetEntity o : tweets){
-                UserEntity received,user = new UserEntity();
-                Query query=new Query();
-                user.setLoginId(o.getLoginId());
-                query.addCriteria(Criteria.where("loginId").is(user.getLoginId()));
-                received = this.repository.findByCriteria(query);
-                o.setFirstName(received.getFirstName());
-                o.setLastName(received.getLastName());
+    public ResponseEntity<ResponseObject> likeTweet(TweetEntity tweetEntity) {
+        TweetEntity tweet = new TweetEntity();
+        Query query = new Query();
+        try
+        {
 
-               // o.setUserDetails(user);
-//                dup.add(o);
+            if (!tweetEntity.getId().isEmpty())
+            {
+                //   Query query=new Query();
+                query.addCriteria(Criteria.where("_id").is(tweetEntity.getId()));
+                tweet = this.tweetRepository.findByCriteria(query);
 
+                Update update = new Update();
+                update.set("likeCount", tweet.getLikeCount() + 1);
+                this.tweetRepository.updateByCriteria(query, update);
+                responseObject.setStatus(HttpStatus.OK);
+                responseObject.setMessage("Tweet Updated Successfully");
             }
 
-    //            tweets.addAll(dup);
 
-            System.out.println(tweets);
-            return tweets;
+            return ResponseEntity.ok().body(responseObject);
+
+        } catch (Exception ex)
+        {
+            responseObject.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            responseObject.setMessage("Error in Updating Tweet" + ex.getMessage());
+            return ResponseEntity.internalServerError().body(responseObject);
+
         }
-
-
-
-
-
-
-
 
 
     }
 
+    /* Service method for getting tweet of specific user */
+
+    public List<TweetEntity> getUsersInfo(String userId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("loginId").is(userId));
+        List<TweetEntity> tweets = this.tweetRepository.fetchAll();
+        return tweets.stream().filter(e -> e.getLoginId().equals(userId)).collect(Collectors.toList());
+    }
+
+    /* Service method for deleting tweet from the database */
+
+    public ResponseEntity<ResponseObject> deleteTweet(TweetEntity tweetEntity) {
+        //TweetEntity tweet = new TweetEntity();
+        Query query = new Query();
+        try
+        {
+
+            if (!tweetEntity.getId().isEmpty())
+            {
+                //   Query query=new Query();
+                query.addCriteria(Criteria.where("_id").is(tweetEntity.getId()));
+                DeleteResult result = this.tweetRepository.deleteById(query);
+                //  tweet.setLikeCount(tweet.getLikeCount() + 1);
+                if (result != null)
+                {
+                    responseObject.setStatus(HttpStatus.OK);
+                    responseObject.setMessage("Tweet Updated Successfully");
+                }
+            }
 
 
+            return ResponseEntity.ok().body(responseObject);
 
+        } catch (Exception ex)
+        {
+            responseObject.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            responseObject.setMessage("Error in Updating Tweet" + ex.getMessage());
+            return ResponseEntity.internalServerError().body(responseObject);
 
+        }
+    }
+}

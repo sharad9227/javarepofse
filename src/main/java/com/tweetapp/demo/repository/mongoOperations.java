@@ -7,6 +7,7 @@ import java.util.List;
 public interface mongoOperations {
 
     List<UserEntity> findAll();
+
     UserEntity saveUser(UserEntity entity);
 
 

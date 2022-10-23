@@ -41,9 +41,7 @@ public class UserEntity {
     private Date registrationDate;
 
     @Transient
-    private Collection<Role> roles= new ArrayList<>();
-
-
+    private Collection<Role> roles = new ArrayList<>();
 
 
 }

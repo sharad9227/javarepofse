@@ -4,14 +4,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+
 @Component
 public class ResponseObject {
+    public HttpStatus status;
     // Response Message for Success / Error
     private String message;
-    public HttpStatus status;
     private HashMap<String, Object> responseObj;
-    private HashMap<String,String> loginId;
-
+    private HashMap<String, String> loginId;
+    private String errorMessage;
 
     public HashMap<String, String> getLoginId() {
         return loginId;
@@ -20,11 +21,6 @@ public class ResponseObject {
     public void setLoginId(HashMap<String, String> loginId) {
         this.loginId = loginId;
     }
-
-
-
-
-    private String errorMessage;
 
     public HashMap<String, Object> getResponseObj() {
         return responseObj;

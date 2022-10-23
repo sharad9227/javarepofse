@@ -14,25 +14,26 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 @SpringBootApplication
 @EnableWebMvc
-public class TweetAppApplication{
+public class TweetAppApplication {
 
-	private static final Logger logger = LoggerFactory.getLogger(TweetAppApplication.class);
+    private static final Logger logger = LoggerFactory.getLogger(TweetAppApplication.class);
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		SpringApplication.run(TweetAppApplication.class, args);
-	}
-		@Bean
-		public WebMvcConfigurer corsConfigure() {
-			return new WebMvcConfigurerAdapter() {
-				@Override
-				public void addCorsMappings(CorsRegistry registry) {
-					registry.addMapping("/**").allowedOrigins("http://localhost:4200");
-				}
-			};
-		}
+        SpringApplication.run(TweetAppApplication.class, args);
+    }
 
-	}
+    @Bean
+    public WebMvcConfigurer corsConfigure() {
+        return new WebMvcConfigurerAdapter() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**").allowedOrigins("http://localhost:4200");
+            }
+        };
+    }
+
+}
 
 
 

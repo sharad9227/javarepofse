@@ -1,5 +1,6 @@
 package com.tweetapp.demo.config;
 
+import com.tweetapp.demo.entity.TweetEntity;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +16,7 @@ import java.util.Map;
 @Configuration
 public class KafkaProducerConfig {
 
-    @Value("${spring.kafka.bootstrap-servers}")
+    @Value("${spring.kafka.bootstrap.servers}")
     private String bootStrapServers;
 
     public Map<String, Object> producerConfig() {
@@ -29,13 +30,13 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public ProducerFactory<String, String> producerFactory() {
+    public ProducerFactory<String, TweetEntity> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfig());
     }
 
     @Bean
-    public KafkaTemplate<String, String> kafkaTemplate(ProducerFactory<String, String> producerFactory) {
-        return new KafkaTemplate<>(producerFactory);
+    public KafkaTemplate<String, TweetEntity> kafkaTemplate(ProducerFactory<String, TweetEntity> producerFactory) {
+        return new KafkaTemplate<String, TweetEntity>(producerFactory);
     }
 
 
